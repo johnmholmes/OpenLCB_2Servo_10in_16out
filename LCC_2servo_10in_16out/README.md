@@ -50,6 +50,10 @@ You will need to have the OpenLCB_Single_Thread library installed for use with t
 - ACAN_ESP32 3.0.3
 - MCP23017 by Bertrand version 2.0.0
 
+- D12 is used but care must be taken when using it as an input. 
+The IR sensors powered by 3.3 volts will hold the Pin HIGH at bootup stoping the ESP32 from booting up. 
+This only occurs if the sensor does not detect a loco above it.
+
 
 
 

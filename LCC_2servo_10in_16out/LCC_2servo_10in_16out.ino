@@ -379,10 +379,26 @@ void userHardReset() {}
 NodeID nodeid(NODE_ADDRESS);  
 #include "OpenLCBMid.h"    
 
+// Immediately update and move the servo when its angle is changed in the CDI
+void servoServoSet(uint32_t address) {
+  for(int s = 0; s < NUM_SERVOS; s++) {
+    for(int p = 0; p < NUM_POS; p++) {
+      if(address == EEADDR(servos[s].pos[p].angle)) {
+        uint8_t newAngle = NODECONFIG.read(EEADDR(servos[s].pos[p].angle));
+        curpos[s] = p;          // Update current position index to match the edited position
+        servoTarget[s] = newAngle;
+        servoMoving[s] = true;  // Flag as moving so the task immediately sweeps to it
+        midCrossed[s] = false;
+        return;
+      }
+    }
+  }
+}
+
 void userConfigWritten(uint32_t address, uint16_t length, uint16_t func)
 {
   EEPROMcommit;
-  servoSet();
+  servoServoSet(address);  // Instantly target and move the servo upon CDI save
 }
 
 // Drop-in replacement for servoBackgroundTask() in the 2 servo / 10 in / 16 out sketch.
